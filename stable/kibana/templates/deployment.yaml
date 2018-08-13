@@ -60,6 +60,11 @@ spec:
           mountPath: "/usr/share/kibana/config/{{ $configFile }}"
           subPath: {{ $configFile }}
         {{- end }}
+        {{- range .Values.filesPlugins }}
+        - name: {{ template "kibana.name" $ }}-plugins
+          mountPath: "/usr/share/kibana/plugins/{{ .mountPath }}"
+          subPath: {{ .subPath }}
+        {{- end }}
     {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
 {{ toYaml .Values.image.pullSecrets | indent 8 }}
@@ -78,3 +83,6 @@ spec:
         - name: {{ template "kibana.name" . }}
           configMap:
             name: {{ template "kibana.fullname" . }}
+        - name: {{ template "kibana.name" . }}-plugins
+          configMap:
+            name: {{ template "kibana.fullname" . }}-plugins
