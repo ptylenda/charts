@@ -1,0 +1,68 @@
+{{- if eq .Values.exporter.kind "DaemonSet" -}}
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: {{ template "exporter.fullname" . }}
+  labels:
+    app: {{ template "exporter.name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: {{ .Release.Name }}
+    component: "{{ .Values.exporter.name }}"
+    heritage: {{ .Release.Service }}
+spec:
+  {{- if .Values.exporter.updateStrategy }}
+  updateStrategy:
+{{ toYaml .Values.exporter.updateStrategy | indent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.exporter.podAnnotations }}
+{{ toYaml .Values.exporter.podAnnotations | indent 8}}
+        {{- end }}
+      labels:
+        app: {{ template "exporter.name" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: {{ .Release.Name }}
+        component: "{{ .Values.exporter.name }}"
+        {{- if .Values.exporter.podLabels }}
+{{ toYaml .Values.exporter.podLabels | indent 8}}
+        {{- end }}
+    spec:
+      containers:
+      - name: {{ template "exporter.fullname" . }}
+        image: "{{ .Values.exporter.image.repo }}:{{ .Values.exporter.image.tag }}"
+        imagePullPolicy: {{ default "" .Values.exporter.image.pullPolicy | quote }}
+        args:
+          {{- range $key, $value := .Values.exporter.extraArgs }}
+          {{- if $value }}
+          - --{{ $key }}={{ $value }}
+          {{- else }}
+          - --{{ $key }}
+          {{- end }}
+          {{- end }}
+        resources:
+{{ toYaml .Values.exporter.resources | indent 10 }}
+        {{- if .Values.exporter.securityContext }}
+        securityContext:
+{{ toYaml .Values.exporter.securityContext | indent 10 }}
+        {{- end }}
+        ports:
+        - name: metrics
+          containerPort: 9289
+          protocol: TCP
+          {{- if .Values.exporter.useHostPort }}
+          hostPort: {{ .Values.exporter.hostPort }}
+          {{- end }}
+        volumeMounts:
+        - mountPath: /dev/ipmi0
+          name: dev-ipmi
+      {{- if .Values.exporter.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.exporter.nodeSelector | indent 8 }}
+      {{- end }}
+      volumes:
+      - name: dev-ipmi
+        hostPath:
+          path: {{ .Values.exporter.ipmiDevice }}
+{{- end -}}

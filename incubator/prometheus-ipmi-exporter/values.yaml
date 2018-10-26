@@ -1,0 +1,83 @@
+## Default values.yaml for Prometheus.io IPMI Exporter
+## This is a YAML-formatted file.
+## ref: https://hub.docker.com/r/lovoo/ipmi_exporter/tags/
+
+exporter:
+  ## IPMI exporter container name
+  ##
+  name: prometheus-ipmi-exporter
+
+  ## IPMI exporter container image
+  ##
+  image:
+    repo: "lovoo/ipmi_exporter"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  ## DaemonSet or Deployment
+  ##
+  kind: DaemonSet
+
+  ## Custom Update Strategy
+  ##
+  updateStrategy:
+    type: OnDelete
+
+  ## Additional IPMI exporter container arguments
+  ##
+  extraArgs: {}
+
+  ## Node labels for IPMI exporter pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Annotations to be added to IPMI exporter pods
+  ##
+  podAnnotations: {}
+
+  ## Labels to be added to IPMI exporter pods
+  ##
+  podLabels: {}
+    # key: value
+
+  ## IPMI exporter resource limits & requests
+  ## Ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources: {}
+    # requests:
+    #   memory: 256Mi
+    #   cpu: 0.1
+    # limits:
+    #   memory: 2Gi
+    #   cpu: 1
+
+  ## Security context to be added to IPMI exporter pods
+  ##
+  securityContext:
+    privileged: true
+
+  ## IPMI device path to be mounted in IPMI exporter pod as volume
+  ##
+  ipmiDevice: /dev/ipmi0  
+
+  service:
+    annotations:
+      prometheus.io/scrape: "true"
+
+    labels: {}
+
+    # Exposed as a headless service:
+    # https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
+    clusterIP: None
+
+    ## List of IP addresses at which the node-exporter service is available
+    ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+    ##
+    externalIPs: []
+
+    hostPort: 9289
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    servicePort: 9289
+    type: ClusterIP

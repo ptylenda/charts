@@ -1,0 +1,16 @@
+name: prometheus-ipmi-exporter
+version: 0.0.1
+appVersion: 1.0.0
+description: Helm chart for IPMI Exporter for prometheus.io, written in Go.
+keywords:
+- ipmi
+- ipmi-exporter
+- exporter
+- prometheus
+- hardware
+home: https://github.com/lovoo/ipmi_exporter
+sources:
+- https://github.com/lovoo/ipmi_exporter
+maintainers:
+- name: Piotr Tylenda
+  email: tylenda.piotr@gmail.com

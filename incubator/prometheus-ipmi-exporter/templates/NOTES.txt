@@ -1,0 +1,15 @@
+To open a shell session in the container running IPMI exporter run the following:
+
+- kubectl exec -i -t --namespace {{ .Release.Namespace }} $(kubectl get pods --namespace {{ .Release.Namespace }} -l app={{ template "exporter.name" . }} -o jsonpath='{.items[0].metadata.name}') /bin/sh
+
+To tail the logs for an IPMI exporter pod in the Daemonset run the following:
+
+- kubectl logs -f --namespace {{ .Release.Namespace }} $(kubectl get pods --namespace {{ .Release.Namespace }} -l app={{ template "exporter.name" . }} -o jsonpath='{ .items[0].metadata.name }')
+
+{{- if eq .Values.exporter.kind "LoadBalancer" }}
+
+To watch for the LoadBalancer IP run the following
+
+- kubectl get svc -w --namespace {{ .Release.Namespace }} -l app={{ template "exporter.name" . }}
+{{- end }}
+
